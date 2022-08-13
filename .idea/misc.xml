@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Android Studio/ExamManagementUser/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.279" />
+        <entry key="..\:/Android Studio/ExamManagementUser/app/src/main/res/drawable/bottomsheet_dialog_bg.xml" value="0.279" />
+        <entry key="..\:/Android Studio/ExamManagementUser/app/src/main/res/drawable/ic_launcher_foreground.xml" value="0.279" />
+        <entry key="..\:/Android Studio/ExamManagementUser/app/src/main/res/drawable/input_bg.xml" value="0.137" />
+        <entry key="..\:/Android Studio/ExamManagementUser/app/src/main/res/layout/activity_exam_details.xml" value="0.4" />
+        <entry key="..\:/Android Studio/ExamManagementUser/app/src/main/res/layout/activity_home.xml" value="0.4" />
+        <entry key="..\:/Android Studio/ExamManagementUser/app/src/main/res/layout/activity_main.xml" value="0.16" />
+        <entry key="..\:/Android Studio/ExamManagementUser/app/src/main/res/layout/activity_waiting.xml" value="0.2" />
+        <entry key="..\:/Android Studio/ExamManagementUser/app/src/main/res/layout/exam.xml" value="0.27447916666666666" />
+        <entry key="..\:/Android Studio/ExamManagementUser/app/src/main/res/layout/fragment_candidates.xml" value="0.1" />
+        <entry key="..\:/Android Studio/ExamManagementUser/app/src/main/res/layout/fragment_login.xml" value="0.19136960600375236" />
+        <entry key="..\:/Android Studio/ExamManagementUser/app/src/main/res/layout/fragment_signup.xml" value="0.1265625" />
+        <entry key="..\:/Android Studio/ExamManagementUser/app/src/main/res/layout/home_nav_header.xml" value="0.27447916666666666" />
+        <entry key="..\:/Android Studio/ExamManagementUser/app/src/main/res/layout/student_base.xml" value="0.27447916666666666" />
+        <entry key="..\:/Android Studio/ExamManagementUser/app/src/main/res/menu/done_menu.xml" value="0.27447916666666666" />
+        <entry key="..\:/Android Studio/ExamManagementUser/app/src/main/res/menu/exam_details_menu.xml" value="0.536" />
+        <entry key="..\:/Android Studio/ExamManagementUser/app/src/main/res/menu/home_menu.xml" value="0.27447916666666666" />
+        <entry key="..\:/Android Studio/ExamManagementUser/app/src/main/res/menu/home_navigation.xml" value="0.6" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>
