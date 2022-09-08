@@ -38,7 +38,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -46,6 +45,7 @@ public class ExamDetailsActivity extends AppCompatActivity {
     ActivityExamDetailsBinding binding;
     private final String TAG = this.getClass().getSimpleName();
     private String examId;
+    CountDownTimer timer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +74,7 @@ public class ExamDetailsActivity extends AppCompatActivity {
 
     private void updateUi() {
         binding.examDetailsRefresh.setRefreshing(true);
-        QUEUE.add(new JsonObjectRequest(Request.Method.GET, String.format("%s?exam=%s", API.GET_EXAM_BY_ID, examId), null, response -> {
+        QUEUE.add(new JsonObjectRequest(Request.Method.GET, String.format("%s?exam=%s", API.EXAM_BY_ID, examId), null, response -> {
             Exam exam = new Gson().fromJson(response.toString(), Exam.class);
             binding.examCategory.setText(String.format("%s / %s / %s / %s / %s / %s", exam.getDegree(), exam.getCourse(), exam.getStream(), exam.getRegulation(), exam.getSemester(), exam.getPaper().getCode()));
             binding.examItemName.setText(exam.getName());
@@ -97,28 +97,33 @@ public class ExamDetailsActivity extends AppCompatActivity {
                     if (position > 0) {
                         Hall hall = exam.getHalls().get(position - 1);
                         binding.candidatesFetchingProgress.setVisibility(View.VISIBLE);
-                        List<Student> students = new ArrayList<>();
                         binding.allCandidates.setLayoutManager(new LinearLayoutManager(ExamDetailsActivity.this));
-                        binding.allCandidates.setAdapter(new AttendanceAdapter(hall, students, (student, present, studentPosition) -> hall.getCandidates().put(student.get_id(), present)));
-                        QUEUE.add(new JsonArrayRequest(Request.Method.POST, API.HALL_CANDIDATES, null, response -> {
-                            students.addAll(new Gson().fromJson(response.toString(), new TypeToken<List<Student>>() {
-                            }.getType()));
-                            Log.d(TAG, "onItemSelected: "+students);
-                            Objects.requireNonNull(binding.allCandidates.getAdapter()).notifyDataSetChanged();
+                        binding.allCandidates.setAdapter(null);
+                        QUEUE.add(new JsonArrayRequest(Request.Method.POST, API.STUDENTS_IN, null, response -> {
+                            List<Student> students = new Gson().fromJson(response.toString(), new TypeToken<List<Student>>() {}.getType());
+                            long currentTime = System.currentTimeMillis();
+                            binding.allCandidates.setAdapter(new AttendanceAdapter(hall, students, (currentTime >= exam.getAttendanceStartingTime() && currentTime <= exam.getAttendanceEndingTime()), (student, present, studentPosition) -> hall.getCandidates().put(student.get_id(), present)));
                             binding.candidatesFetchingProgress.setVisibility(View.GONE);
-
-                            if (System.currentTimeMillis() >= exam.getAttendanceStartingTime() && System.currentTimeMillis() <= exam.getAttendanceEndingTime()) {
+                            if (currentTime >= exam.getAttendanceStartingTime() && currentTime <= exam.getAttendanceEndingTime()) {
                                 binding.updateAttendanceArea.setVisibility(View.VISIBLE);
-                                new CountDownTimer(exam.getExamEndingTime() - System.currentTimeMillis(), 1000) {
+                                timer = new CountDownTimer(exam.getExamEndingTime() - System.currentTimeMillis(), 1000) {
                                     @Override
                                     public void onTick(long millisUntilFinished) {
-                                        binding.attendanceTimer.setText(convertMillisToTime(millisUntilFinished));
+                                        try {
+                                            binding.attendanceTimer.setText(convertMillisToTime(millisUntilFinished));
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
                                     }
 
                                     @Override
                                     public void onFinish() {
-                                        Toast.makeText(ExamDetailsActivity.this, "Attendance submission time up", Toast.LENGTH_SHORT).show();
-                                        binding.updateAttendanceArea.setVisibility(View.GONE);
+                                        try {
+                                            Toast.makeText(ExamDetailsActivity.this, "Attendance submission time up", Toast.LENGTH_SHORT).show();
+                                            binding.updateAttendanceArea.setVisibility(View.GONE);
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
                                     }
                                 }.start();
                             } else {
@@ -161,7 +166,7 @@ public class ExamDetailsActivity extends AppCompatActivity {
                             @Override
                             public byte[] getBody() {
                                 Map<String, List<String>> body = new HashMap<>();
-                                body.put("candidates", new ArrayList<>(hall.getCandidates().keySet()));
+                                body.put("students", new ArrayList<>(hall.getCandidates().keySet()));
                                 return new Gson().toJson(body).getBytes(StandardCharsets.UTF_8);
                             }
                         }).setRetryPolicy(new DefaultRetryPolicy());
@@ -181,7 +186,11 @@ public class ExamDetailsActivity extends AppCompatActivity {
         })).setRetryPolicy(new DefaultRetryPolicy());
     }
 
-
+    @Override
+    protected void onDestroy() {
+        if (timer != null) timer.cancel();
+        super.onDestroy();
+    }
 
     private String convertMillisToTime(long millis) {
         return String.format(Locale.getDefault(), "%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis),
